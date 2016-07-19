@@ -1,6 +1,8 @@
 # Notes from Hadley's R Packages Book
 Dan Yavorsky  
 
+# Minimum Viable Package Creation with VCS
+
 ### Create a Package
 
 - To create a package from scratch, click "New Package" > "New Directory" > "R Package"
@@ -8,10 +10,10 @@ Dan Yavorsky
 
 ### Connect to GitHub
 
-First, track the pacakge with git:
+First, track the package with git:
 
 - When creating a package, check the "git" box
-- Or run `git init` in a shell after `cd`ing into the package's directory
+- Or run `git init` in a shell after you `cd` into the package's directory
 
 Second, create a GitHub repo:
 
@@ -34,28 +36,36 @@ git push -u origin master
 - **Ctrl-Alt-M** opens the commit window
 - **Ctrl-Alt-D** diffs files
 
-You'll want a markdown README file at the top level of the directory so that GitHub renders it on the repo's landing page. Best to add the `README.Rmd` and `README.html` to `.gitignore` so there's no confusion on which gets rendered by GitHub.
+You'll want a markdown README file at the top level of the directory so that GitHub renders it on the repo's landing page. It's best to add the `README.Rmd` and `README.html` to `.gitignore` so there's no confusion on which gets rendered by GitHub.
+
+### Package Pieces
+
+- R code goes in the `R/` directory. You _cannot_ put subdirectories in there.
+- C++ code goes in the `src/` directory
+- Documentation goes in the `man/` directory (done automatically with roxygen comments)
+- Datasets go in the `data/` directory
+- `DESCRIPTION` and `NAMESPACE` files live at the top level
+- The top level is also a good place for a `README` file, especially if the package is on GitHub
 
 ### Package Development Workflow
 
-To load the development version of the package, run `devtools::load_all()`. The easier way, however, is to press **Ctrl-Shift-L** in RStudio, which saves all open files and loads the package. So the R code workflow is:
+To load the development version of the package, run `devtools::load_all()`. The easier way, however, is to press **Ctrl-Shift-L** in RStudio, which saves all open files and loads the package. 
+
+You'll mostly be writing functions. That workflow is:
 
 - Edit an R File
 - Press **Ctrl-Shift-L**
-- Explore code in console
-- Repeat
+- Use function at command line
 
-R code goes in the `R/` directory. You _cannot_ put subdirectories in there.
+When you document functions with roxygen (see below), that workflow is:
 
-Some useful keyboard shortcuts for package authoring:
-
-- `Ctrl-Shift-B` Build and reload package
-- `Ctrl-Shift-E` Check package
-- `Ctrl-Shift-T` Test package
+- Add roxygen comments to your .R files
+- Press **Ctrl-Shift-D** to convert roxygen comments to .Rd files
+- Preview documentation with ?
 
 ### Build Ignore
 
-To omit a directory or file when bundling a package, include a RegEx in the `.Rbuildignore` file. For this package, the RMarkdown version of this ReadMe file (`README.Rmd`) has been added to `.Rbuildignore`.
+To omit a directory or file when building a package, include a RegEx in the `.Rbuildignore` file. For this package, the RMarkdown version of this ReadMe file (`README.Rmd`) has been added to `.Rbuildignore`. The line reads `^ReadMe\.Rmd$`.
 
 ### DESCRIPTION File
 
@@ -83,12 +93,59 @@ Suggests:
   MASS (>= 7.3.0)
 ```
 
+### NAMESPACE File
+
+This file control hows your package interacts with the rest of R, importantly making it self-contained. It controls _imports_, which define how a function in one package finds a function in another; and _exports_, which define which of your functions are available outside of your package.
+
+We will not generate the NAMESPACE file by hand, but will instead use roxygen2, as we do for function/dataset documentation (see below). The NAMESPACE workflow will be the same as the documentation workflow:
+
+- Add roxygen comments to your .R files
+- Press **Ctrl-Shift-D** to convert roxygen comments to .Rd files
+- Look at the NAMESPACE file and run tests to check that the specification is correct
+
+For a function to be usable outside of your package, you must _export_ it. Do this by putting `#' #export` in a roxygen block. Roxygen will handle the specific "export" code in the NAMESPACE file for you. (For datasets that live in `data/`, they don't use the usual namespace mechanism and don't need to be exported.)
+
+If your package uses functions from another package, that package must be loaded or loaded-and-attached. Here's the recommended way to do so:
+
+- If you are using just a few functions from another package, put that package name in the `Imports:` field in the `DESCRIPTION` file, and then call those functions using `::` (e.g., `bayesm::breg()`)
+- If you are using certain functions repeatedly, you can avoid `::` with `@importFrom pkg fun` as a roxygen comment
+- If you use many functions from a package repeatedly, then as a last resort, use `@ import pkg` as a roxygen comment
+ 
+
+### A bit more about package development
+
+For package development, it's helpful to know about the 5 states that a package can be in. 
+
+  1. _Source_: Just a directory of files and subdirectories (i.e., the development version of a package)
+  1. _Bundled_: A compressed, single file (.tar.gz) of the package; not useful on its own, but a useful intermediary step
+  1. _Binary_: Platform-specific; how packages are distributed via CRAN
+  1. _Installed_: A decompressed binary package
+  1. _In-Memory_: to use a package, you need to load it into memory
+
+A note on loading and attaching packages:
+
+  - R loads packages automatically when you use them
+  - To use a package without providing its name (e.g., `breg()` instead of `bayesm::breg()`) you need to attach it to the search path
+  - `library()` and `require()` load then attach an installed package, but these are not useful when developing a package; instead use `devtools::load_all()` or RStudio's "Build & Reload" feature
+  - `.libPaths()` shows you where libraries (directories of packages) live on your computer. R searches these when you call `library()` or `require()`. The difference is that, if the requested package isn't in one of those libraries, `library()` throws an error whereas `require()` prints a message and returns `FALSE`.
+
+The command line tool `R CMD INSTALL` powers all package installation. The R package `devtools` provides functions that are wrappers for `R CMD INSTALL` so that you can call this command from instide of R. 
+
+- `devtools::install()` is a wrapper for `R CMD INSTALL`
+- `devtools::build()` is a wrapper for `R CMD BUILD` that turns source packages into bundles
+- `devtools::install_github()` downloads a source package from GitHub, runs `build()` to make vignettes, and then uses `R CMD INSTALL` to do the install
+- `devtools::install_url()` and `devtools::install_bitbucket()` work similarly
+
+*****
+
+# Additional Topics
+
 ### Documentation Workflow with Roxygen2
 
 The four basic steps are:
 
 1. Add roxygen comments to your .R files
-1. Run `devtools::document()` (or press **Ctrl-Shift-D** in RStuio) to covernt roxygen comments to .Rd files
+1. Run `devtools::document()` (or press **Ctrl-Shift-D** in RStudio) to convert roxygen comments to .Rd files
 1. Preview documentation with ?
 1. Repeat
 
@@ -228,32 +285,9 @@ CRAN Notes
 
 You build vignettes locally. CRAN only receives the output (html/pdf) and the source code. CRAN does not rebuild the vignette; it only checks that the code is runnable (by running it).
 
-### 5 States of Packages
+### Testing
 
-For package development, it's helpful to know about the various states that a package can be in. 
-
-  1. _Source_: Just a directory of files and subdirectories (i.e., the development version of a package)
-  1. _Bundled_: A compressed, single file (.tar.gz) of the package; not useful on its own, but a useful intermediary step
-  1. _Binary_: Platform-specific; how packages are distributed via CRAN
-  1. _Installed_: A decompressed binary package
-  1. _In-Memory_: to use a package, you need to load it into memory
-
-A note on loading and attaching packages:
-
-  - R loads packages automatically when you use them
-  - To use a package without providing its name (e.g., `breg()` instead of `bayesm::breg()`) you need to attach it to the search path
-  - `library()` and `require()` load then attach an installed package, but these are not useful when developing a package; instead use `devtools::load_all()` or RStudio's "Build & Reload" feature (discussed later)
-  - `.libPaths()` shows you where libraries (directories of packages) live on your computer. R searches these when you call `library()` or `require()`. The difference is that, if the requested package isn't in one of those libraries, `library()` thows an error whereas `require()` prints a message and returns `FALSE`.
-
-
-
-
-The command line tool `R CMD INSTALL` powers all package installation. The R package `devtools` provides functions that are wrappers for `R CMD INSTALL` so that you can call this command from instide of R. 
-
-- `devtools::install()` is a wrapper for `R CMD INSTALL`
-- `devtools::build()` is a wrapper for `R CMD BUILD` that turns source packages into bundles
-- `devtools::install_github()` downloads a source package from GitHub, runs `build()` to make vignettes, and then uses `R CMD INSTALL` to do the install
-- `devtools::install_url()` and `devtools::install_bitbucket()` work similarly
+[**ADD TESTING CHAPTER NOTES**]
 
 
 

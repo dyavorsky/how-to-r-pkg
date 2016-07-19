@@ -1,0 +1,14 @@
+Package: HowToPkg
+Type: Package
+Title: A test package for learning about package development
+Version: 0.1.0
+Authors@R: person("Dan", "Yavorsky", email = "dyavorsky@gmail.com", role = c("aut", "cre"))
+Description: This is a package version of taking notes; the notes are mostly
+    taken from Hadley Wickham's "R Packages" book.
+License: What license is it under?
+LazyData: TRUE
+Imports:
+    Rcpp (>= 0.12.5)
+LinkingTo: Rcpp
+RoxygenNote: 5.0.1
+Suggests: testthat
