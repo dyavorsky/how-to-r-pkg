@@ -32,6 +32,12 @@ git remote add origin git@github.com:dyavorsky/HowToPkg.git
 git push -u origin master
 ```
 
+### Working with Git/GitHub
+
+- To keep files untracked, add them to `.gitignore` (can do this with a right-click in the Git pane of RStudio)
+- **Ctrl-Aklt-M** opens the commit window
+
+
 ### 5 States of Packages
 
 For package development, it's helpful to know about the various states that a package can be in. 
