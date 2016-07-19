@@ -47,6 +47,12 @@ To load the development version of the package, run `devtools::load_all()`. The 
 
 R code goes in the `R/` directory. You _cannot_ put subdirectories in there.
 
+Some useful keyboard shortcuts for package authoring:
+
+- `Ctrl-Shift-B` Build and reload package
+- `Ctrl-Shift-E` Check package
+- `Ctrl-Shift-T` Test package
+
 ### Build Ignore
 
 To omit a directory or file when bundling a package, include a RegEx in the `.Rbuildignore` file. For this package, the RMarkdown version of this ReadMe file (`README.Rmd`) has been added to `.Rbuildignore`.
