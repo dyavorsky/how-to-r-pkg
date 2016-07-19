@@ -103,16 +103,16 @@ We will not generate the NAMESPACE file by hand, but will instead use roxygen2, 
 - Press **Ctrl-Shift-D** to convert roxygen comments to .Rd files
 - Look at the NAMESPACE file and run tests to check that the specification is correct
 
-For a function to be usable outside of your package, you must _export_ it. Do this by putting `#' #export` in a roxygen block. Roxygen will handle the specific "export" code in the NAMESPACE file for you. (For datasets that live in `data/`, they don't use the usual namespace mechanism and don't need to be exported.)
+For a function to be usable outside of your package, you must **export** it. Do this by putting `#' @export` in a roxygen block. Roxygen will handle the specific "export" code in the NAMESPACE file for you. (For datasets that live in `data/`, they don't use the usual namespace mechanism and don't need to be exported.)
 
-If your package uses functions from another package, that package must be loaded or loaded-and-attached. Here's the recommended way to do so:
+If your package uses functions from another package, you must **import** them (i.e., that package must be loaded or loaded-and-attached). Here's the recommended way to do so:
 
 - If you are using just a few functions from another package, put that package name in the `Imports:` field in the `DESCRIPTION` file, and then call those functions using `::` (e.g., `bayesm::breg()`)
 - If you are using certain functions repeatedly, you can avoid `::` with `@importFrom pkg fun` as a roxygen comment
 - If you use many functions from a package repeatedly, then as a last resort, use `@ import pkg` as a roxygen comment
  
 
-### A bit more about package development
+### A bit about package development
 
 For package development, it's helpful to know about the 5 states that a package can be in. 
 
@@ -122,14 +122,7 @@ For package development, it's helpful to know about the 5 states that a package 
   1. _Installed_: A decompressed binary package
   1. _In-Memory_: to use a package, you need to load it into memory
 
-A note on loading and attaching packages:
-
-  - R loads packages automatically when you use them
-  - To use a package without providing its name (e.g., `breg()` instead of `bayesm::breg()`) you need to attach it to the search path
-  - `library()` and `require()` load then attach an installed package, but these are not useful when developing a package; instead use `devtools::load_all()` or RStudio's "Build & Reload" feature
-  - `.libPaths()` shows you where libraries (directories of packages) live on your computer. R searches these when you call `library()` or `require()`. The difference is that, if the requested package isn't in one of those libraries, `library()` throws an error whereas `require()` prints a message and returns `FALSE`.
-
-The command line tool `R CMD INSTALL` powers all package installation. The R package `devtools` provides functions that are wrappers for `R CMD INSTALL` so that you can call this command from instide of R. 
+The command line tool `R CMD INSTALL` powers all package installation. The R package `devtools` provides functions that are wrappers for `R CMD INSTALL` so that you can call this command from inside of R. 
 
 - `devtools::install()` is a wrapper for `R CMD INSTALL`
 - `devtools::build()` is a wrapper for `R CMD BUILD` that turns source packages into bundles
@@ -145,7 +138,7 @@ The command line tool `R CMD INSTALL` powers all package installation. The R pac
 The four basic steps are:
 
 1. Add roxygen comments to your .R files
-1. Run `devtools::document()` (or press **Ctrl-Shift-D** in RStudio) to convert roxygen comments to .Rd files
+1. Run `devtools::document()` (or press **Ctrl-Shift-D**^[This must be enabled in Package Options > Build Tools] in RStudio) to convert roxygen comments to .Rd files
 1. Preview documentation with ?
 1. Repeat
 
@@ -289,7 +282,32 @@ You build vignettes locally. CRAN only receives the output (html/pdf) and the so
 
 [**ADD TESTING CHAPTER NOTES**]
 
+### Datasets
 
+You can include data in your package. `.RData` datasets go in `data/`; raw datasets go in `inst/extdata/`.
 
+- Put datasets as `.RData` files in the `/data` directory with the same name as the object once it's loaded into R's workspace 
+- Include `LazyData: true` in the `DESCRIPTION` file, so that datasets don't occupy memory until used
+- Exported datasets must be documented; do so by documenting the _name_ of the dataset and use the two roxygen tags `@format` and `@source`:
 
+```
+#' Prices of 50,000 round cut diamonds.
+#'
+#' A dataset containing the prices and other attributes of almost 54,000
+#' diamonds.
+#'
+#' @format A data frame with 53940 rows and 10 variables:
+#' \describe{
+#'   \item{price}{price, in US dollars}
+#'   \item{carat}{weight of the diamond, in carats}
+#'   ...
+#' }
+#' @source \url{http://www.diamondse.info/}
+"diamonds"
+```
+
+For CRAN, datasets should be less than 1MB and compressed.
+
+- Run `tools::checkRdaFiles()` to determine the best compression for each file
+- Rerun `devtools::use_data()` with `compress` set to that optimal value
 
