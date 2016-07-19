@@ -1,12 +1,13 @@
 Package: HowToPkg
 Type: Package
-Title: What the Package Does (Title Case)
+Title: A test package for learning about package development
 Version: 0.1.0
-Authors@R: person("First", "Last", email = "first.last@example.com", role = c("aut", "cre"))
-Description: More about what it does (maybe more than one line)
+Authors@R: person("Dan", "Yavorsky", email = "dyavorsky@gmail.com", role = c("aut", "cre"))
+Description: This is a package version of taking notes; the notes are mostly
+    taken from Hadley Wickham's "R Packages" book.
 License: What license is it under?
 LazyData: TRUE
-Imports: 
+Imports:
     Rcpp (>= 0.12.5)
-LinkingTo: 
+LinkingTo:
     Rcpp

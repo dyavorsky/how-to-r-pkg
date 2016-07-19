@@ -49,6 +49,34 @@ To load the development version of the package, run `devtools::load_all()`. The 
 - Explore code in console
 - Repeat
 
+R code goes in the `R/` directory. You _cannot_ put subdirectories in there.
+
+### DESCRIPTION File
+
+This file uses Debian Control Format (DCF), which means each line has a field name and a value, separate by a colon. When values span multiple lines, they need to be indented.
+
+Title and Description appear on the CRAN download page:
+
+- `Title:` is a one-line description (65 char max, no punctuation, no formatting)
+- `Description:` is a one-paragraph description (80 char/line max, indent subsequent lines)
+
+This file is where you put other package dependencies (not in a `library()` or `require()` statement somewhere in your code!)
+
+- `Imports: dplyr, ggvis` means these packages _must_ be present for your package to work
+- `Suggests: dplyr, ggvis` is weaker, see Hadley's _R Packages_ page 35
+
+You can manually add information to the DESCRIPTION file, or you can use `devtools::use_package("dplyr")` to do it for you.
+
+It's a good idea to require a minimum version of other packages if they're dependencies. So your DESCRIPTION file might look something like this 
+
+```
+Imports:
+  dplyr (>= 0.3.0.1),
+  ggvis (>= 0.2)
+Suggests:
+  MASS (>= 7.3.0)
+```
+
 ### 5 States of Packages
 
 For package development, it's helpful to know about the various states that a package can be in. 
