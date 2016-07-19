@@ -90,7 +90,6 @@ Documenting R code with roxygen2 involves putting the help documentation directl
 
 Roxygen comments come in blocks. A block is all the documentation for a specific function and it goes _before_ the function. Lines must wrap at 80 characters. Thus one .R file can have multiple documented functions. 
 
-<<<<<<< HEAD
 Each block is made up of an introduction and tags with the format `@tagname details`. The intro has a title, description, and (otionally) details. Then you include tags for documentation elements. 
 
 **Common tags are:**
@@ -150,13 +149,6 @@ _Math_
 
 - `\eqn{}`
 - `\deqn{}`
-=======
-Each block is made up of an introduction and tags with the format `@tagname details`. The intro has a title, description, and (otionally) details. Then you include tags for documentation elements. For example, the most common tags for functions are:
-
-- `@param name description`
-- `@examples`
-- `@return description`
->>>>>>> 0b05ea70361a8b978d6ff0e3df60dfd34ada1096
 
 So an example might be:
 
@@ -192,52 +184,19 @@ So an example might be:
 #' \dontrun{
 #' sum("a")
 #' }
-<<<<<<< HEAD
 #'
 #' @section Warning:
 #' Do not operate heavy machinery within 8 hours of using this function.
 #'
-=======
-sum <- function(..., na.rm = TRUE) {}
-```
-
-Tags for navigating between files
-
-- `@seealso`: point to other places 
-    - on web (`\url{}`)
-    - in your package (`\code{\link{functionname}}`)
-    - in another package (`\code{\link[packagename]{functionname}`)
-- `@family` when all functions in a family should link to each other
-
-```
->>>>>>> 0b05ea70361a8b978d6ff0e3df60dfd34ada1096
 #' @family aggregate functions
 #' @seealso \code{\link{prod}} for products, \code{\link{cumsum}} for cumulative
 #'   sums, and \code{\link{colSums}}/\code{\link{rowSums}} marginal sums over
 #'   high-dimensional arrays.
-<<<<<<< HEAD
 #'
 sum <- function(..., na.rm = TRUE) {}
 ```
 
 
-=======
-```
-
-Tags for finding documentation
-
-- `@aliases alias1 alias2` adds aliases which can be used with `?`
-- `@keywords keyword1 keyword2` must be taken from a predefined list found in `file.path(R.home("doc"), "KEYWORDS")`
-
-Tags documenting datasets
-
-- `@format` for providing an overview of a dataset
-- `@source` to provide details from where you got a dataset
-
-Tags for documenting the whole package
-
-- `@section title` for long documentation that require section breaks
->>>>>>> 0b05ea70361a8b978d6ff0e3df60dfd34ada1096
 
 ### 5 States of Packages
 
