@@ -196,7 +196,31 @@ So an example might be:
 sum <- function(..., na.rm = TRUE) {}
 ```
 
+### Vignettes
 
+Common vignette browsing commands:
+
+- `browseVignettes()` to see all installed vignettes
+- `browseVignettes(packagename)` to see vignettes for a specific package
+- `vignette()` to read a vignette
+- `edit(vignette())` to see the vignette's code
+
+To create a vignette with devtools: `devtools::use_vignette("my-vignette")`, which does 3 things:
+
+1. Creates a `vignettes/` directory
+1. Adds the necessary dependencies to the `DESCRIPTION` file (adds `knitr` to the `Suggests` and `VignetteBuilder` fields)
+1. Drafts a template vignette, `vignettes/my-vignette.Rmd`
+
+Workflow:
+
+- Modify the vignette
+- Run individual code chunks with **Ctrl-Alt-C**
+- Run all code chunks with **Ctrl-Alt-R**
+- Knit to preview output with **Ctrl-Shift-K**
+
+CRAN Notes
+
+You build vignettes locally. CRAN only receives the output (html/pdf) and the source code. CRAN does not rebuild the vignette; it only checks that the code is runnable (by running it).
 
 ### 5 States of Packages
 
