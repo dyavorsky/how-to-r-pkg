@@ -35,8 +35,19 @@ git push -u origin master
 ### Working with Git/GitHub
 
 - To keep files untracked, add them to `.gitignore` (can do this with a right-click in the Git pane of RStudio)
-- **Ctrl-Aklt-M** opens the commit window
+- **Ctrl-Alt-M** opens the commit window
+- **Ctrl-Alt-D** diffs files
 
+You'll want a markdown README file at the top level of the directory so that GitHub renders it on the repo's landing page. Best to add the `README.Rmd` and `README.html` to `.gitignore` so there's no confusion on which gets rendered by GitHub.
+
+### Package Development Workflow
+
+To load the development version of the package, run `devtools::load_all()`. The easier way, however, is to press **Ctrl-Shift-L** in RStudio, which saves all open files and loads the package. So the R code workflow is:
+
+- Edit an R File
+- Press **Ctrl-Shift-L**
+- Explore code in console
+- Repeat
 
 ### 5 States of Packages
 
