@@ -1,12 +1,15 @@
 # Notes from Hadley's R Packages Book
 Dan Yavorsky  
 
-# Minimum Viable Package Creation with VCS
+
+# Minimum Package Creation with VCS and C++
+
 
 ### Create a Package
 
 - To create a package from scratch, click "New Package" > "New Directory" > "R Package"
 - To associate a new package with an existing R project, use `devtools::use_rstudio("path/to/package")`
+
 
 ### Connect to GitHub
 
@@ -30,13 +33,14 @@ git remote add origin git@github.com:dyavorsky/HowToPkg.git
 git push -u origin master
 ```
 
-### Working with Git/GitHub
+To work with Git/GitHub:
 
-- To keep files untracked, add them to `.gitignore` (can do this with a right-click in the Git pane of RStudio)
+- Add them to `.gitignore` to keep them untracked (can do this with a right-click in the Git pane of RStudio)
 - **Ctrl-Alt-M** opens the commit window
 - **Ctrl-Alt-D** diffs files
 
 You'll want a markdown README file at the top level of the directory so that GitHub renders it on the repo's landing page. It's best to add the `README.Rmd` and `README.html` to `.gitignore` so there's no confusion on which gets rendered by GitHub.
+
 
 ### Package Pieces
 
@@ -44,8 +48,10 @@ You'll want a markdown README file at the top level of the directory so that Git
 - C++ code goes in the `src/` directory
 - Documentation goes in the `man/` directory (done automatically with roxygen comments)
 - Datasets go in the `data/` directory
+- Other files like `CITATION` or raw data (`extdata`) go in the `inst` (installed files) directory
 - `DESCRIPTION` and `NAMESPACE` files live at the top level
 - The top level is also a good place for a `README` file, especially if the package is on GitHub
+
 
 ### Package Development Workflow
 
@@ -57,15 +63,14 @@ You'll mostly be writing functions. That workflow is:
 - Press **Ctrl-Shift-L**
 - Use function at command line
 
+To omit a directory or file when building a package, include a RegEx in the `.Rbuildignore` file. For this package, the RMarkdown version of this ReadMe file (`README.Rmd`) has been added to `.Rbuildignore`. The line reads `^ReadMe\.Rmd$`.
+
 When you document functions with roxygen (see below), that workflow is:
 
 - Add roxygen comments to your .R files
 - Press **Ctrl-Shift-D** to convert roxygen comments to .Rd files
 - Preview documentation with ?
 
-### Build Ignore
-
-To omit a directory or file when building a package, include a RegEx in the `.Rbuildignore` file. For this package, the RMarkdown version of this ReadMe file (`README.Rmd`) has been added to `.Rbuildignore`. The line reads `^ReadMe\.Rmd$`.
 
 ### DESCRIPTION File
 
@@ -93,6 +98,7 @@ Suggests:
   MASS (>= 7.3.0)
 ```
 
+
 ### NAMESPACE File
 
 This file control hows your package interacts with the rest of R, importantly making it self-contained. It controls _imports_, which define how a function in one package finds a function in another; and _exports_, which define which of your functions are available outside of your package.
@@ -110,7 +116,43 @@ If your package uses functions from another package, you must **import** them (i
 - If you are using just a few functions from another package, put that package name in the `Imports:` field in the `DESCRIPTION` file, and then call those functions using `::` (e.g., `bayesm::breg()`)
 - If you are using certain functions repeatedly, you can avoid `::` with `@importFrom pkg fun` as a roxygen comment
 - If you use many functions from a package repeatedly, then as a last resort, use `@ import pkg` as a roxygen comment
- 
+
+
+## C++ 
+
+To set up your package with Rcpp:
+
+- Select "Package with Rcpp" when creating a new package with RStudio's dropdown
+- Or run `devtools::use_rcpp()`
+
+This does the following:
+
+- Creates an `src/` directory to hold the `.cpp` files
+- Adds `Rcpp` to the `LinkingTo` and `Imports` fields in the `DESCRIPTION` file
+- Sets up a `.gitignore` file 
+- Tells you the two roxygen tags you need to add to your package (`#' @useDynLib you-pkg-name` and `#' @importFrom Rcpp sourceCpp`) for the namespace imports
+
+The workflow will be:
+
+- Create/edit C++ files and generate necessary namespace modifications (**Ctrl-Shift-D**)
+- Click the "Build & Reload" button or press **Ctrl-Shift-B**
+- Use your function at the command line
+
+"Build and Reload" does a lot of work behind the scenes. One of those things is to call `Rcpp::compileAttributes()`, which inspects `.cpp` functions looking for _attributes_ of the form `// [[Rcpp::export]]`. When it finds one, it generates the code needed to make the function available in R, and creates `src/RcppExports.cpp` and `R/RcppExports.R`. _Never_ modify these by hand.
+
+Two important parts of each C++ file are:
+
+1. The header
+
+    `#include <Rcpp.h>`  
+    `using namespace Rcpp;`
+    
+1. Making the function available in R
+
+    `// [[Rcpp::export]]`
+
+
+
 
 ### A bit about package development
 
@@ -129,9 +171,20 @@ The command line tool `R CMD INSTALL` powers all package installation. The R pac
 - `devtools::install_github()` downloads a source package from GitHub, runs `build()` to make vignettes, and then uses `R CMD INSTALL` to do the install
 - `devtools::install_url()` and `devtools::install_bitbucket()` work similarly
 
+
+
+
+
+
 *****
 
+
+
+
+
+
 # Additional Topics
+
 
 ### Documentation Workflow with Roxygen2
 
@@ -142,7 +195,7 @@ The four basic steps are:
 1. Preview documentation with ?
 1. Repeat
 
-Documenting R code with roxygen2 involves putting the help documentation directly into the .R code files using roxygen comments, which start with `#'`. 
+Documenting R code with roxygen2 involves putting the help documentation directly into the .R code files using roxygen comments, which start with `#'`. In C++ files, roxygen comments are `//'`
 
 Roxygen comments come in blocks. A block is all the documentation for a specific function and it goes _before_ the function. Lines must wrap at 80 characters. Thus one .R file can have multiple documented functions. 
 
@@ -252,6 +305,7 @@ So an example might be:
 sum <- function(..., na.rm = TRUE) {}
 ```
 
+
 ### Vignettes
 
 Common vignette browsing commands:
@@ -278,9 +332,11 @@ CRAN Notes
 
 You build vignettes locally. CRAN only receives the output (html/pdf) and the source code. CRAN does not rebuild the vignette; it only checks that the code is runnable (by running it).
 
+
 ### Testing
 
 [**ADD TESTING CHAPTER NOTES**]
+
 
 ### Datasets
 
