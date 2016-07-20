@@ -8,6 +8,8 @@ Dan Yavorsky
 ### Create a Package
 
 - To create a package from scratch, click "New Package" > "New Directory" > "R Package"
+    - Change the "type" dropdown to "Package w/ Rcpp" to include C++ code
+    - Check the "Create a git repository" box to `git init` the top level directory
 - To associate a new package with an existing R project, use `devtools::use_rstudio("path/to/package")`
 
 
@@ -15,7 +17,7 @@ Dan Yavorsky
 
 First, track the package with git:
 
-- When creating a package, check the "git" box
+- When creating a package, check the "git" box as indicated above
 - Or run `git init` in a shell after you `cd` into the package's directory
 
 Second, create a GitHub repo:
@@ -35,11 +37,11 @@ git push -u origin master
 
 To work with Git/GitHub:
 
-- Add them to `.gitignore` to keep them untracked (can do this with a right-click in the Git pane of RStudio)
+- Add files or directories to `.gitignore` to keep them untracked (can do this with a right-click in the Git pane of RStudio)
 - **Ctrl-Alt-M** opens the commit window
 - **Ctrl-Alt-D** diffs files
 
-You'll want a markdown README file at the top level of the directory so that GitHub renders it on the repo's landing page. It's best to add the `README.Rmd` and `README.html` to `.gitignore` so there's no confusion on which gets rendered by GitHub.
+You'll want a markdown README file at the top level of the directory so that GitHub renders it on the repo's landing page. It's best to add the `README.Rmd` and `README.html` to `.gitignore` so there's no confusion on which gets rendered by GitHub (the `README.md` one).
 
 
 ### Package Pieces
@@ -115,7 +117,7 @@ If your package uses functions from another package, you must **import** them (i
 
 - If you are using just a few functions from another package, put that package name in the `Imports:` field in the `DESCRIPTION` file, and then call those functions using `::` (e.g., `bayesm::breg()`)
 - If you are using certain functions repeatedly, you can avoid `::` with `@importFrom pkg fun` as a roxygen comment
-- If you use many functions from a package repeatedly, then as a last resort, use `@ import pkg` as a roxygen comment
+- If you use many functions from a package repeatedly, then as a last resort, use `@import pkg` as a roxygen comment
 
 
 ## C++ 
@@ -130,7 +132,7 @@ This does the following:
 - Creates an `src/` directory to hold the `.cpp` files
 - Adds `Rcpp` to the `LinkingTo` and `Imports` fields in the `DESCRIPTION` file
 - Sets up a `.gitignore` file 
-- Tells you the two roxygen tags you need to add to your package (`#' @useDynLib you-pkg-name` and `#' @importFrom Rcpp sourceCpp`) for the namespace imports
+- Tells you the two roxygen tags you need to add to your package (`#' @useDynLib your-pkg-name` and `#' @importFrom Rcpp sourceCpp`) for the namespace imports
 
 The workflow will be:
 
@@ -192,12 +194,12 @@ The four basic steps are:
 
 1. Add roxygen comments to your .R files
 1. Run `devtools::document()` (or press **Ctrl-Shift-D**^[This must be enabled in Package Options > Build Tools] in RStudio) to convert roxygen comments to .Rd files
-1. Preview documentation with ?
+1. Preview documentation with `?`
 1. Repeat
 
-Documenting R code with roxygen2 involves putting the help documentation directly into the .R code files using roxygen comments, which start with `#'`. In C++ files, roxygen comments are `//'`
+Documenting R code with roxygen2 involves putting the help documentation directly into the .R code files using roxygen comments, which start with `#'`. In C++ files, roxygen comments are `//'`. Lines must wrap at 80 characters. 
 
-Roxygen comments come in blocks. A block is all the documentation for a specific function and it goes _before_ the function. Lines must wrap at 80 characters. Thus one .R file can have multiple documented functions. 
+Roxygen comments come in blocks. A block is all the documentation for a specific function and it goes _before_ the function. Thus one .R file can have multiple documented functions. 
 
 Each block is made up of an introduction and tags with the format `@tagname details`. The intro has a title, description, and (otionally) details. Then you include tags for documentation elements. 
 
@@ -338,6 +340,11 @@ You build vignettes locally. CRAN only receives the output (html/pdf) and the so
 [**ADD TESTING CHAPTER NOTES**]
 
 
+### Checking
+
+[**ADD CHECKING CHAPTER NOTES**]
+
+
 ### Datasets
 
 You can include data in your package. `.RData` datasets go in `data/`; raw datasets go in `inst/extdata/`.
@@ -365,5 +372,5 @@ You can include data in your package. `.RData` datasets go in `data/`; raw datas
 For CRAN, datasets should be less than 1MB and compressed.
 
 - Run `tools::checkRdaFiles()` to determine the best compression for each file
-- Rerun `devtools::use_data()` with `compress` set to that optimal value
+- Rerun `devtools::use_data()` with the `compress` argument set to that optimal value
 
