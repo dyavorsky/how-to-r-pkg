@@ -1,4 +1,4 @@
-# Notes from Hadley's R Packages Book
+# Notes from _R Packages_ Book by Hadley Wickham
 Dan Yavorsky  
 
 
