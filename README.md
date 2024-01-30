@@ -31,7 +31,7 @@ Last, connect the local project to the GitHub repo:
 - Follow the prompt on GitHub, it will look something like this
 
 ```
-git remote add origin git@github.com:dyavorsky/HowToPkg.git  
+git remote add origin git@github.com:dyavorsky/how-to-r-pkg.git  
 git push -u origin master
 ```
 
